@@ -161,7 +161,6 @@
     </div>
 
     <div id="guestRequestSection" class="space-y-6">
-      <!-- ROOM NUMBER & SERVICE SELECTION AT THE VERY TOP -->
       <div class="remal-card p-6 rounded-3xl space-y-5">
         <h2 class="text-base font-serif-luxury font-bold text-stone-900 border-b border-stone-100 pb-3" id="reqHeader">Request Guest Service</h2>
         <form id="guestRequestForm" class="space-y-4">
@@ -217,7 +216,6 @@
         </div>
       </div>
 
-      <!-- MY ROOM FOLIO & CHARGES AND STAY FEEDBACK ON THE SAME CARD BELOW -->
       <div class="remal-card p-6 rounded-3xl space-y-6 bg-gradient-to-br from-amber-50/30 via-white to-emerald-50/20">
         <div class="space-y-3 pb-4 border-b border-stone-100">
           <div class="flex justify-between items-center">
@@ -418,7 +416,6 @@
       </div>
     </div>
 
-    <!-- ADMIN RESERVATIONS PANEL -->
     <div id="adminReservationsPanel" class="hidden space-y-4">
       <div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-200 space-y-4">
         <div class="flex justify-between items-center border-b border-stone-100 pb-3">
@@ -482,8 +479,8 @@
   </div>
 
   <script>
-    const SUPABASE_URL = 'https://bqusphztkwxacczqeiuo.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJxdXNwaHp0a3d4YWNjenFlaXVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUxOTg3MDgsImV4cCI6MjEwMDc3NDcwOH0.geeVnnELbA85xXfDsW9pry_VcdJTfiC_bjw_48XC6Ik';
+    const SUPABASE_URL = 'https://xfuouanqmrlucwomhzeo.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhmdW91YW5xbXJsdWN3b21oemVvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUyNjAwODQsImV4cCI6MjEwMDgzNjA4NH0.wbEuFw_3od3Mhx4c0LYzabP3UQCQbP0jNgIOaZvvcFA';
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     let audioContext = null;
@@ -541,7 +538,7 @@
       { id: 'hm_sp4', categoryKey: 'Soup', catName: { en: 'Soup', ar: 'الشوربة', hi: 'सूप' }, name: { en: 'Soup of the Day', ar: 'شوربة اليوم', hi: 'दिन का सूप' }, desc: { en: 'Chef\'s daily special, freshly prepared with seasonal ingredients', ar: 'الشوربة اليومية المميزة من إعداد الشيف، تحضر طازجة باستخدام مكونات موسمية مختارة', hi: 'शेफ की दैनिक विशेष डिश, मौसमी सामग्री के साथ ताज़ा तैयार की गई' }, price: 25 },
 
       { id: 'hm_sl1', categoryKey: 'Salads and Mezzeh', catName: { en: 'Salads and Mezzeh', ar: 'السلطات والمقبلات', hi: 'सलाद और मेज़ेह' }, name: { en: 'Classic Caesar Salad', ar: 'سلطة سيزر الكلاسيكية', hi: 'क्लासिक सीज़र सलाद' }, desc: { en: 'Lettuce, shaved parmesan cheese, Caesar dressing, croutons', ar: 'خس، جبنة بارميزان مبشورة، صلصة سيزر، خبز محمص', hi: 'सलाद पत्ता, परमेसन पनीर, सीज़र ड्रेसिंग, क्रौटन' }, price: 45 },
-      { id: 'hm_sl2', categoryKey: 'Salads and Mezzeh', catName: { en: 'Salads and Mezzeh', ar: 'السلطات والمقبلات', hi: 'सलाद और مقبلات' }, name: { en: 'Chicken Caesar Salad', ar: 'سلطة سيزر مع الدجاج', hi: 'चिकन सीज़र सलाद' }, desc: { en: 'Lettuce, chicken, beef bacon, shaved parmesan cheese, Caesar dressing, croutons', ar: 'خس، دجاج، لحم بقري مقدد، جبنة بارميزان مبشورة، صلصة سيزر، خبز محمص', hi: 'सलाद पत्ता, चिकन, बीफ बेकन, परमेसन पनीर, सीज़र ड्रेसिंग' }, price: 49 },
+      { id: 'hm_sl2', categoryKey: 'Salads and Mezzeh', catName: { en: 'Salads and Mezzeh', ar: 'السلطات والمقبلات', hi: 'सलाद और मेज़ेह' }, name: { en: 'Chicken Caesar Salad', ar: 'سلطة سيزر مع الدجاج', hi: 'चिकन सीज़र सलाद' }, desc: { en: 'Lettuce, chicken, beef bacon, shaved parmesan cheese, Caesar dressing, croutons', ar: 'خس، دجاج، لحم بقري مقدد، جبنة بارميزان مبشورة، صلصة سيزر، خبز محمص', hi: 'सलाद पत्ता, चिकन, बीफ बेकन, परमेसन पनीर, सीज़र ड्रेसिंग' }, price: 49 },
       { id: 'hm_sl3', categoryKey: 'Salads and Mezzeh', catName: { en: 'Salads and Mezzeh', ar: 'السلطات والمقبلات', hi: 'सलाद और मेज़ेह' }, name: { en: 'Shrimps Caesar Salad', ar: 'سلطة سيزر بالروبيان', hi: 'झींगा सीज़र सलाद' }, desc: { en: 'Lettuce, grilled shrimps, parmesan cheese, Caesar dressing, croutons', ar: 'خس، روبيان مشوي، جبنة بارميزان، صلصة سيزر، خبز محمص', hi: 'सलाद पत्ता, ग्रिल्ड झींगा, परमेसन पनीर, सीज़र ड्रेसिंग' }, price: 59 },
       { id: 'hm_sl4', categoryKey: 'Salads and Mezzeh', catName: { en: 'Salads and Mezzeh', ar: 'السلطات والمقبلات', hi: 'सलाद और मेज़ेह' }, name: { en: 'Quinoa Salad', ar: 'سلطة الكينوا', hi: 'क्विनोआ सलाद' }, desc: { en: 'Quinoa combined with finely chopped parsley and tomato', ar: 'كينوا مع بقدونس وطماطم مفرومة ناعماً', hi: 'बारीक कटे अजमोद और टमाटर के साथ क्विनोआ' }, price: 40 },
       { id: 'hm_sl5', categoryKey: 'Salads and Mezzeh', catName: { en: 'Salads and Mezzeh', ar: 'السلطات والمقبلات', hi: 'सलाद और मेज़ेह' }, name: { en: 'Fattoush', ar: 'فتوش', hi: 'फत्तूश सलाद' }, desc: { en: 'Lettuce, mint, zaatar, tomatoes, peppers, cucumber, onion, radish, olive oil, lemon juice, pomegranate molasses', ar: 'خس، نعناع، زعتر، طماطم، فلفل، خيار، بصل، فجل، زيت زيتون، عصير ليمون، دبس الرمان', hi: 'सलाद पत्ता, पुदीना, जतूर, टमाटर, शिमला मिर्च, ककड़ी, प्याज, मूली, जैतून का तेल' }, price: 40 },
@@ -631,7 +628,7 @@
       { id: 'hm_ck6', categoryKey: 'Alcoholic Beverages', catName: { en: 'Alcoholic Beverages', ar: 'المشروبات الكحولية', hi: 'मादक पेय' }, name: { en: 'Martini', ar: 'مارتيني', hi: 'मार्टيني' }, desc: { en: 'Gin, dry vermouth and olive', ar: 'جن، فيرموث جاف، زيتون' }, price: 44 },
       { id: 'hm_ck7', categoryKey: 'Alcoholic Beverages', catName: { en: 'Alcoholic Beverages', ar: 'المشروبات الكحولية', hi: 'मादक पेय' }, name: { en: 'Bull Frog', ar: 'بول فروغ', hi: 'बुल फ्रॉग' }, desc: { en: 'Vodka, tequila, rum, gin, blue curaçao and Red Bull', ar: 'فودكا، تكيلا، روم، جن، بلو كوراساو، ريد بول' }, price: 65 },
       { id: 'hm_ck8', categoryKey: 'Alcoholic Beverages', catName: { en: 'Alcoholic Beverages', ar: 'المشروبات الكحولية', hi: 'मादक पेय' }, name: { en: 'Long Island Tea', ar: 'لونغ آيلاند آيس تي', hi: 'लॉन्ग आइलैंड टी' }, desc: { en: 'Vodka, tequila, rum, gin, triple sec and Coke', ar: 'فودكا، تكيلا، روم، جن، تريبل سيك، كوكاكولا' }, price: 65 },
-      { id: 'hm_ck9', categoryKey: 'Alcoholic Beverages', catName: { en: 'Alcoholic Beverages', ar: 'المشروبات الكحولية', hi: 'मादक पेय' }, name: { en: 'Aperol Spritz', ar: 'أبيرول سبريتز', hi: 'एपेरول स्प्रिट्ज़' }, desc: { en: 'Aperol, sparkling wine and soda', ar: 'أبيرول، نبيذ فوار، صودا' }, price: 65 },
+      { id: 'hm_ck9', categoryKey: 'Alcoholic Beverages', catName: { en: 'Alcoholic Beverages', ar: 'المشروبات الكحولية', hi: 'मादक पेय' }, name: { en: 'Aperol Spritz', ar: 'أبيرول سبريتز', hi: 'एपेरोल स्प्रिट्ज़' }, desc: { en: 'Aperol, sparkling wine and soda', ar: 'أبيرول، نبيذ فوار، صودا' }, price: 65 },
 
       { id: 'hm_wh1_g', categoryKey: 'Alcoholic Beverages', catName: { en: 'Alcoholic Beverages', ar: 'المشروبات الكحولية', hi: 'मादक पेय' }, name: { en: 'Jim Beam (Bourbon) - Glass', ar: 'جيم بيم (بوربون) - كاس', hi: 'जिम बीम - ग्लास' }, desc: { en: 'Standard glass serving', ar: 'تقديم بالكاس القياسي' }, price: 44 },
       { id: 'hm_wh1_b', categoryKey: 'Alcoholic Beverages', catName: { en: 'Alcoholic Beverages', ar: 'المشروبات الكحولية', hi: 'मादक पेय' }, name: { en: 'Jim Beam (Bourbon) - Bottle', ar: 'جيم بيم (بوربون) - زجاجة', hi: 'जिम बीम - बोतल' }, desc: { en: 'Full bottle service', ar: 'خدمة الزجاجة الكاملة' }, price: 470 },
