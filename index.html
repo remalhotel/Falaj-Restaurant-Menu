@@ -71,11 +71,41 @@
       </div>
 
       <div class="flex bg-black/40 backdrop-blur-md p-1.5 rounded-2xl text-[11px] font-medium border border-white/25 overflow-x-auto scrollbar-none">
-        <button onclick="switchGuestTab('request')" id="tabRequestBtn" class="flex-1 py-2.5 px-3 rounded-xl bg-white text-stone-900 font-bold shadow-md whitespace-nowrap">🔔 <span id="lblTabRequest">Service</span></button>
-        <button onclick="switchGuestTab('reservation')" id="tabReservationBtn" class="flex-1 py-2.5 px-3 rounded-xl text-stone-200 hover:text-white whitespace-nowrap">🍽️ <span id="lblTabReservation">Reserve Table</span></button>
-        <button onclick="switchGuestTab('offers')" id="tabOffersBtn" class="flex-1 py-2.5 px-3 rounded-xl text-stone-200 hover:text-white whitespace-nowrap">🏷️ <span id="lblTabOffers">Offers</span></button>
+        <button onclick="switchGuestTab('offers')" id="tabOffersBtn" class="flex-1 py-2.5 px-3 rounded-xl bg-white text-stone-900 font-bold shadow-md whitespace-nowrap">🏷️ <span id="lblTabOffers">Offers</span></button>
+        <button onclick="switchGuestTab('request')" id="tabRequestBtn" class="flex-1 py-2.5 px-3 rounded-xl text-stone-200 hover:text-white whitespace-nowrap">🔔 <span id="lblTabRequest">Service</span></button>
         <button onclick="switchGuestTab('facilities')" id="tabFacilitiesBtn" class="flex-1 py-2.5 px-3 rounded-xl text-stone-200 hover:text-white whitespace-nowrap">🏛️ <span id="lblTabFacilities">Facilities</span></button>
+        <button onclick="switchGuestTab('chat')" id="tabChatBtn" class="flex-1 py-2.5 px-3 rounded-xl text-stone-200 hover:text-white whitespace-nowrap">💬 <span id="lblTabChat">Live Chat</span></button>
+        <button onclick="switchGuestTab('reservation')" id="tabReservationBtn" class="flex-1 py-2.5 px-3 rounded-xl text-stone-200 hover:text-white whitespace-nowrap">🍽️ <span id="lblTabReservation">Reserve Table</span></button>
         <button onclick="switchGuestTab('faq')" id="tabFaqBtn" class="flex-1 py-2.5 px-3 rounded-xl text-stone-200 hover:text-white whitespace-nowrap">❓ <span id="lblTabFaq">FAQ</span></button>
+      </div>
+    </div>
+
+    <!-- LIVE CHAT SECTION -->
+    <div id="guestChatSection" class="hidden space-y-6">
+      <div class="remal-card p-6 rounded-3xl space-y-4">
+        <div class="border-b border-stone-100 pb-3 flex justify-between items-center">
+          <div>
+            <h2 class="text-base font-serif-luxury font-bold text-stone-900" id="chatHeaderTitle">💬 Reception Live Chat</h2>
+            <p class="text-xs text-stone-500" id="chatHeaderSub">Chat directly with the front desk team</p>
+          </div>
+          <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full">Online</span>
+        </div>
+        
+        <div class="space-y-2">
+          <label class="block text-xs font-bold text-stone-600">Your Room / Villa Number</label>
+          <input type="text" id="chat_room" placeholder="Enter room number (e.g. 222)" onkeyup="onRoomNumberChange()" class="w-full border border-stone-200 rounded-xl p-2.5 text-xs bg-stone-50 outline-none" required>
+          <!-- Affichage dynamique du nom du client détecté dans le chat -->
+          <p id="chatGuestDetectedName" class="text-emerald-700 text-xs font-bold mt-1 hidden">👤 Client détecté : <span id="chatDetectedNameSpan" class="underline"></span></p>
+        </div>
+
+        <div id="chatMessagesContainer" class="h-72 overflow-y-auto space-y-3 bg-stone-50 p-3 rounded-2xl border border-stone-200 text-xs">
+          <p class="text-center text-stone-400 py-10 italic">Enter your room number above to start chatting with reception.</p>
+        </div>
+
+        <form id="chatMessageForm" onsubmit="sendClientChatMessage(event)" class="flex space-x-2 pt-2">
+          <input type="text" id="chatMessageInput" placeholder="Type your message here..." class="flex-1 border border-stone-200 rounded-xl p-3 text-xs bg-stone-50 outline-none" required>
+          <button type="submit" class="bg-stone-900 hover:bg-stone-800 text-white px-5 py-3 rounded-xl font-bold text-xs shadow transition">Send</button>
+        </form>
       </div>
     </div>
 
@@ -94,7 +124,7 @@
           <div class="grid grid-cols-2 gap-3">
             <div>
               <label class="block text-xs font-bold text-stone-600 mb-1 tracking-wide" id="lblResRoom">Room / Villa Number</label>
-              <input type="text" id="res_room" placeholder="e.g., 104" class="w-full border border-stone-200 rounded-xl p-3 text-sm bg-stone-50 outline-none" required>
+              <input type="text" id="res_room" placeholder="e.g., 222" class="w-full border border-stone-200 rounded-xl p-3 text-sm bg-stone-50 outline-none" required>
             </div>
             <div>
               <label class="block text-xs font-bold text-stone-600 mb-1 tracking-wide" id="lblResGuests">Number of Guests</label>
@@ -134,7 +164,8 @@
       </div>
     </div>
 
-    <div id="guestOffersSection" class="hidden space-y-5">
+    <!-- OFFERS SECTION -->
+    <div id="guestOffersSection" class="space-y-5">
       <div id="categoryFilters" class="flex space-x-2 overflow-x-auto pb-1 text-xs font-semibold scrollbar-none"></div>
       <div id="cardsContainer" class="space-y-5">
         <p class="text-center text-xs text-stone-400 py-8" id="lblLoadingOffers">Loading live offers...</p>
@@ -160,13 +191,15 @@
       </div>
     </div>
 
-    <div id="guestRequestSection" class="space-y-6">
+    <div id="guestRequestSection" class="hidden space-y-6">
       <div class="remal-card p-6 rounded-3xl space-y-5">
         <h2 class="text-base font-serif-luxury font-bold text-stone-900 border-b border-stone-100 pb-3" id="reqHeader">Request Guest Service</h2>
         <form id="guestRequestForm" class="space-y-4">
           <div>
             <label class="block text-xs font-bold text-stone-600 mb-1 tracking-wide" id="lblRoom">Room Number</label>
-            <input type="text" id="req_room" placeholder="e.g., 104, 201 or 601" onkeyup="onRoomNumberChange()" onchange="onRoomNumberChange()" class="w-full border border-stone-200 rounded-xl p-3 text-sm bg-stone-50/55 outline-none" required>
+            <input type="text" id="req_room" placeholder="e.g., 222, 223 or 224" onkeyup="onRoomNumberChange()" onchange="onRoomNumberChange()" class="w-full border border-stone-200 rounded-xl p-3 text-sm bg-stone-50/55 outline-none" required>
+            <!-- Affichage dynamique du nom du client détecté -->
+            <p id="guestDetectedName" class="text-emerald-700 text-xs font-bold mt-1.5 hidden">👤 Client détecté : <span id="detectedNameSpan" class="underline"></span></p>
             <p id="roomErrorMsg" class="text-rose-600 text-[11px] font-bold mt-1 hidden">❌ Erreur de numéro : Numéro de chambre ou de villa invalide.</p>
           </div>
           <div>
@@ -303,9 +336,14 @@
     <div class="flex justify-between items-center bg-stone-200/80 p-1.5 rounded-2xl text-xs font-bold overflow-x-auto scrollbar-none">
       <div class="flex space-x-2 w-full md:w-auto">
         <button onclick="switchAdminTab('offers')" id="admTabOffers" class="px-4 py-2.5 rounded-xl bg-stone-900 text-white whitespace-nowrap">🏷️ Content & Menu</button>
+        <button onclick="switchAdminTab('pms')" id="admTabPms" class="px-4 py-2.5 rounded-xl text-stone-600 whitespace-nowrap">📋 PMS Mass Sync</button>
         <button onclick="switchAdminTab('requests')" id="admTabRequests" class="px-4 py-2.5 rounded-xl text-stone-600 relative whitespace-nowrap">
           🔔 Requests
           <span id="requestBadge" class="hidden absolute -top-1 -right-1 bg-rose-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full pulse-notification">0</span>
+        </button>
+        <button onclick="switchAdminTab('chat')" id="admTabChat" class="px-4 py-2.5 rounded-xl text-stone-600 relative whitespace-nowrap">
+          💬 Live Chat
+          <span id="chatBadge" class="hidden absolute -top-1 -right-1 bg-rose-600 text-white text-[9px] font-black px-2 py-0.5 rounded-full pulse-notification">0</span>
         </button>
         <button onclick="switchAdminTab('reservations')" id="admTabReservations" class="px-4 py-2.5 rounded-xl text-stone-600 relative whitespace-nowrap">
           🍽️ Reservations
@@ -317,6 +355,41 @@
       </div>
       <div class="flex items-center space-x-2 pl-2">
         <button onclick="logoutAdmin()" class="bg-rose-50 hover:bg-rose-100 text-rose-700 px-3 py-1.5 rounded-xl text-xs font-bold border border-rose-200 transition whitespace-nowrap">🚪 Logout</button>
+      </div>
+    </div>
+
+    <!-- ADMIN PMS MASS SYNC PANEL -->
+    <div id="adminPmsPanel" class="hidden space-y-4">
+      <div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-200 space-y-4">
+        <div>
+          <h2 class="text-base font-serif-luxury font-bold text-stone-900">📋 PMS In-House Report Mass Import</h2>
+          <p class="text-xs text-stone-500 mt-1">Collez ci-dessous le rapport In-House copié depuis votre PDF PMS. Le système met à jour automatiquement la correspondance des chambres et noms de clients.</p>
+        </div>
+        <div class="space-y-2">
+          <textarea id="pmsRawInput" rows="8" placeholder="Collez le texte du rapport PDF ici..." class="w-full border border-stone-200 rounded-2xl p-3.5 text-xs bg-stone-50 outline-none font-mono"></textarea>
+        </div>
+        <button type="button" onclick="handlePmsMassImport()" class="bg-stone-900 hover:bg-stone-800 text-white font-bold py-3 px-6 rounded-xl text-xs transition shadow">🚀 Synchroniser et Remplacer la Base</button>
+
+        <div class="pt-4 border-t border-stone-100 space-y-3">
+          <h3 class="text-xs font-bold text-stone-700 uppercase tracking-wide">Clients actuellement en maison dans le système (<span id="pmsGuestCount">0</span>)</h3>
+          <div id="pmsGuestsListContainer" class="max-h-60 overflow-y-auto space-y-1.5 text-xs">
+            <p class="text-stone-400 italic">Aucun client importé pour le moment.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN CHAT PANEL -->
+    <div id="adminChatPanel" class="hidden space-y-4">
+      <div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-200 space-y-4">
+        <div class="flex justify-between items-center border-b border-stone-100 pb-3">
+          <div>
+            <h2 class="text-base font-serif-luxury font-bold text-stone-900">Live Guest Chat Support</h2>
+            <p class="text-[10px] text-stone-500">Conversations with guests in real-time</p>
+          </div>
+          <button onclick="fetchChatMessages()" class="text-xs bg-stone-100 text-stone-700 px-3 py-2 rounded-xl font-semibold border border-stone-200">🔄 Refresh</button>
+        </div>
+        <div id="adminChatContainer" class="space-y-4"></div>
       </div>
     </div>
 
@@ -403,7 +476,7 @@
         <div class="flex justify-between items-center border-b border-stone-100 pb-3">
           <div>
             <h2 class="text-base font-serif-luxury font-bold text-stone-900">Live Service Requests</h2>
-            <p class="text-[10px] text-stone-500">Real-time room service and guest requests</p>
+            <p class="text-[10px] text-stone-500">Real-time room service and guest requests with PMS Verification</p>
           </div>
           <div class="flex items-center space-x-2">
             <button onclick="enableAudioAlerts()" id="btnAudioEnable" class="text-xs bg-amber-50 text-amber-800 hover:bg-amber-100 px-3 py-2 rounded-xl font-bold border border-amber-200 shadow-sm transition">
@@ -487,10 +560,12 @@
     let audioEnabled = false;
     let previousPendingCount = 0;
     let previousPendingResCount = 0;
+    let previousChatCount = 0;
     let currentUserSession = null;
     let roomServiceMenu = [];
     let cartState = {};
     let starredItems = JSON.parse(localStorage.getItem('remal_starred') || '{}');
+    let cachedPmsGuests = [];
 
     let currentLang = 'en';
     let currentView = 'client';
@@ -499,6 +574,7 @@
     let cachedRequests = [];
     let cachedReservations = [];
     let cachedFeedback = [];
+    let cachedChatMessages = [];
     let activeAnnouncement = null;
     let currentPromoImageData = null;
     let currentFeedbackRating = 5;
@@ -604,7 +680,7 @@
 
       { id: 'hm_mk1', categoryKey: 'Mocktail', catName: { en: 'Mocktail', ar: 'الموكتيل', hi: 'मोकटेल' }, name: { en: 'Fruity', ar: 'فروتي', hi: 'फ्रूटी' }, desc: { en: 'Fresh banana, strawberry, mango, orange juice', ar: 'موز طازج، فراولة، مانجو، عصير برتقال' }, price: 33 },
       { id: 'hm_mk2', categoryKey: 'Mocktail', catName: { en: 'Mocktail', ar: 'الموكتيل', hi: 'पिना कोलाडा' }, name: { en: 'Piña Colada', ar: 'بينا كولادا', hi: 'पिना कोलाडा' }, desc: { en: 'Pineapple juice, coconut cream', ar: 'عصير أناناس، كريمة جوز الهند' }, price: 33 },
-      { id: 'hm_mk3', categoryKey: 'Mocktail', catName: { en: 'Mocktail', ar: 'الموكتيل', hi: 'मोकटेल' }, name: { en: 'Strawberry Margarita', ar: 'مارغريتا الفراولة', hi: 'स्ट्रॉबेरी मार्गारिटा' }, desc: { en: 'Fresh strawberries, lime juice, lime-flavored seltzer', ar: 'فراولة طازجة، عصير ليمون أخضر، صودا بنكهة الليمون' }, price: 33 },
+      { id: 'hm_mk3', categoryKey: 'Mocktail', catName: { en: 'Mocktail', ar: 'الموكتيل', hi: 'स्ट्रॉबेरी मार्गारिटा' }, name: { en: 'Strawberry Margarita', ar: 'مارغريتا الفراولة', hi: 'स्ट्रॉबेरी मार्गारिटा' }, desc: { en: 'Fresh strawberries, lime juice, lime-flavored seltzer', ar: 'فراولة طازجة، عصير ليمون أخضر، صودا بنكهة الليمون' }, price: 33 },
       { id: 'hm_mk4', categoryKey: 'Mocktail', catName: { en: 'Mocktail', ar: 'الموكتيل', hi: 'मोहितो' }, name: { en: 'Mojito', ar: 'موهيتو', hi: 'मोहितो' }, desc: { en: 'Fresh mint leaves, lime, demerara sugar, soda water', ar: 'أوراق نعناع طازجة، ليمون أخضر، سكر ديميرارا، مياه صودا' }, price: 33 },
       { id: 'hm_mk5', categoryKey: 'Mocktail', catName: { en: 'Mocktail', ar: 'الموكتيل', hi: 'मोकटेल' }, name: { en: 'Mai Tai', ar: 'ماي تاي', hi: 'माई ताई' }, desc: { en: 'Lemon-lime soda, pineapple juice, orange juice, grenadine syrup', ar: 'مشروب صودا بالليمون، عصير أناناس، عصير برتقال، شراب الغرينادين' }, price: 33 },
       { id: 'hm_mk6', categoryKey: 'Mocktail', catName: { en: 'Mocktail', ar: 'الموكتيل', hi: 'मोकटेल' }, name: { en: 'Nutella Hot Chocolate', ar: 'شوكولاتة ساخنة مع نوتيلا', hi: 'नूटेला हॉट चॉकलेट' }, desc: { en: 'Milk, Nutella, cocoa', ar: 'حليب، نوتيلا، كاكاو' }, price: 33 },
@@ -685,9 +761,9 @@
 
     const i18n = {
       en: {
-        welcome: "Welcome to Remal Hotel & Villas", lblOffers: "Offers", lblFacilities: "Facilities", lblService: "Service", lblReservation: "Reserve Table", lblFaq: "FAQ",
+        welcome: "Welcome to Remal Hotel & Villas", lblOffers: "Offers", lblFacilities: "Facilities", lblService: "Service", lblChat: "Live Chat", lblReservation: "Reserve Table", lblFaq: "FAQ",
         facHeader: "Hotel Facilities & Amenities", facSub: "Explore our premium venues and spaces", reqHeader: "Request Guest Service",
-        lblRoom: "Room Number", placeholderRoom: "e.g., 104 or Villa 02", lblServiceType: "Service Type",
+        lblRoom: "Room Number", placeholderRoom: "e.g., 222 or Villa 02", lblServiceType: "Service Type",
         lblDetails: "Additional Notes / Request Details", placeholderDetails: "Specify your request here...", btnSubmit: "Send Request to Reception",
         whatsappBtn: "WhatsApp Reception", successMsg: "Request submitted successfully!", chatWhatsapp: "💬 Chat on WhatsApp",
         trackHeader: "📡 Track Active Requests", liveStatus: "Live Status", trackEmpty: "Enter your room number above to track active requests in real time.",
@@ -699,8 +775,6 @@
         favTitle: "⭐ My Favorites & Recent Orders", favBadge: "Quick Access", favEmpty: "No starred favorite dishes yet.",
         menuHeader: "🍽️ Select Menu Items", menuBadge: "In-Room Dining", totalAmt: "Total Amount:", delivTime: "Preferred Delivery Time",
         resHeaderTitle: "🍽️ Table & Restaurant Reservation", resHeaderSub: "Book your dining experience at Falaj Restaurant or Sarab Lounge",
-        lblResName: "Guest Name", lblResRoom: "Room / Villa Number", lblResGuests: "Number of Guests", lblResVenue: "Venue / Restaurant",
-        lblResTime: "Preferred Time", lblResDate: "Reservation Date", lblResNotes: "Special Requests / Dietary Notes", btnSubmitRes: "Confirm Table Reservation",
         services: [
           { val: "Front Desk Inquiry", text: "Front Desk Inquiry" }, 
           { val: "Luggage Assistance", text: "Luggage Assistance" },
@@ -708,9 +782,9 @@
         ]
       },
       ar: {
-        welcome: "مرحباً بكم في فندق وڤلل رمال", lblOffers: "العروض", lblFacilities: "المرافق والخدمات", lblService: "طلب خدمة", lblReservation: "حجز طاولة", lblFaq: "الأسئلة الشائعة",
+        welcome: "مرحباً بكم في فندق وڤلل رمال", lblOffers: "العروض", lblFacilities: "المرافق والخدمات", lblService: "طلب خدمة", lblChat: "محادثة مباشرة", lblReservation: "حجز طاولة", lblFaq: "الأسئلة الشائعة",
         facHeader: "مرافق الفندق والخدمات", facSub: "استكشف أرقى مرافقنا وخدماتنا المميزة", reqHeader: "طلب خدمة النزلاء",
-        lblRoom: "رقم الغرفة", placeholderRoom: "مثال: 104 أو فيلا 02", lblServiceType: "نوع الخدمة",
+        lblRoom: "رقم الغرفة", placeholderRoom: "مثال: 222 أو فيلا 02", lblServiceType: "نوع الخدمة",
         lblDetails: "ملاحظات إضافية / تفاصيل الطلب", placeholderDetails: "اكتب تفاصيل طلبك هنا...", btnSubmit: "إرسال الطلب إلى الاستقبال",
         whatsappBtn: "واتساب الاستقبال", successMsg: "تم إرسال طلبك بنجاح!", chatWhatsapp: "💬 التحدث عبر واتساب",
         trackHeader: "📡 متابعة الطلبات الحالية", liveStatus: "حالة مباشرة", trackEmpty: "أدخل رقم الغرفة أعلاه لمتابعة طلباتك في الوقت الفعلي.",
@@ -722,8 +796,6 @@
         favTitle: "⭐ المفضلة والطلبات الأخيرة", favBadge: "وصول سريع", favEmpty: "لا توجد أطباق مفضلة حتى الآن.",
         menuHeader: "🍽️ اختر أصناف القائمة", menuBadge: "خدمة الغرف", totalAmt: "المبلغ الإجمالي:", delivTime: "وقت التوصيل المفضل",
         resHeaderTitle: "🍽️ حجز طاولة في المطعم", resHeaderSub: "احجز طاولتك في مطعم الفلج أو بار سراب",
-        lblResName: "اسم الضيف", lblResRoom: "رقم الغرفة / الفيلا", lblResGuests: "عدد الضيوف", lblResVenue: "المطعم / الوجهة",
-        lblResTime: "الوقت المفضل", lblResDate: "تاريخ الحجز", lblResNotes: "طلبات خاصة / حساسية طعام", btnSubmitRes: "تأكيد حجز الطاولة",
         services: [
           { val: "Front Desk Inquiry", text: "استفسار الاستقبال" }, 
           { val: "Luggage Assistance", text: "مساعدة في الأمتعة" },
@@ -731,9 +803,9 @@
         ]
       },
       hi: {
-        welcome: "रेमल होटल एंड विला में आपका स्वागत है", lblOffers: "विशेष ऑफ़र", lblFacilities: "सुविधाएं", lblService: "सेवा अनुरोध", lblReservation: "टेबल आरक्षित करें", lblFaq: "सामान्य प्रश्न",
+        welcome: "रेमल होटल एंड विला में आपका स्वागत है", lblOffers: "विशेष ऑफ़र", lblFacilities: "सुविधाएं", lblService: "सेवा अनुरोध", lblChat: "लाइव चैट", lblReservation: "टेबल आरक्षित करें", lblFaq: "सामान्य प्रश्न",
         facHeader: "होटल सुविधाएं", facSub: "हमारे प्रीमियम स्थानों और सेवाओं का अन्वेषण करें", reqHeader: "अतिथि सेवा का अनुरोध करें",
-        lblRoom: "कमरा संख्या", placeholderRoom: "उदा., 104 या विला 02", lblServiceType: "सेवा का प्रकार",
+        lblRoom: "कमरा संख्या", placeholderRoom: "उदा., 222 या विला 02", lblServiceType: "सेवा का प्रकार",
         lblDetails: "अतिरिक्त विवरण / अनुरोध", placeholderDetails: "अपना अनुरोध यहां दर्ज करें...", btnSubmit: "रिसेप्शन को अनुरोध भेजें",
         whatsappBtn: "व्हाट्सएप रिसेप्शन", successMsg: "आपका अनुरोध सफलतापूर्वक भेजा गया!", chatWhatsapp: "💬 व्हाट्सएप पर चैट करें",
         trackHeader: "📡 सक्रिय अनुरोध ट्रैकिंग", liveStatus: "लाइव स्थिति", trackEmpty: "वास्तविक समय में अनुरोध ट्रैक करने के लिए ऊपर कमरा नंबर दर्ज करें।",
@@ -745,8 +817,6 @@
         favTitle: "⭐ मेरे पसंदीदा और हाल के ऑर्डर", favBadge: "त्वरित पहुंच", favEmpty: "अभी तक कोई पसंदीदा व्यंजन नहीं है।",
         menuHeader: "🍽️ मेनू आइटम चुनें", menuBadge: "इन-ルーム डाइनिंग", totalAmt: "कुल राशि:", delivTime: "पसंदीदा डिलीवरी का समय",
         resHeaderTitle: "🍽️ टेबल और रेस्तरां आरक्षण", resHeaderSub: "फलज रेस्टोरेंट या सरब लाउंज में अपनी डाइनिंग बुक करें",
-        lblResName: "अतिथि का नाम", lblResRoom: "कमरा / विला नंबर", lblResGuests: "मेहमानों की संख्या", lblResVenue: "रेस्तरां / स्थान",
-        lblResTime: "पसंदीदा समय", lblResDate: "आरक्षण की तिथि", lblResNotes: "विशेष अनुरोध / आहार संबंधी नोट्स", btnSubmitRes: "टेबल आरक्षण की पुष्टि करें",
         services: [
           { val: "Front Desk Inquiry", text: "फ्रंट डेस्क पूछताछ" }, 
           { val: "Luggage Assistance", text: "सामान सहायता" },
@@ -848,19 +918,19 @@
       const room = urlParams.get('room');
       const adminParam = urlParams.get('admin');
 
-      if (room) {
-        if (validateRoomNumber(room)) {
-          document.getElementById('roomIndicator').innerText = `Room/Villa: ${room} • Remal Hotel`;
-          document.getElementById('req_room').value = room;
-          document.getElementById('res_room').value = room;
-        }
+      if (room && validateRoomNumber(room)) {
+        document.getElementById('roomIndicator').innerText = `Room/Villa: ${room} • Remal Hotel`;
+        document.getElementById('req_room').value = room;
+        document.getElementById('res_room').value = room;
+        document.getElementById('chat_room').value = room;
+        localStorage.setItem('remal_client_room', room);
       } else {
-        // AMÉLIORATION : Récupération automatique du numéro de chambre mémorisé dans le téléphone du client
         const savedRoom = localStorage.getItem('remal_client_room');
         if (savedRoom && validateRoomNumber(savedRoom)) {
           document.getElementById('roomIndicator').innerText = `Room/Villa: ${savedRoom} • Remal Hotel`;
           document.getElementById('req_room').value = savedRoom;
           document.getElementById('res_room').value = savedRoom;
+          document.getElementById('chat_room').value = savedRoom;
         }
       }
 
@@ -881,18 +951,21 @@
       renderRoomServiceMenu();
       renderClientCards();
 
+      await fetchPmsGuests();
       fetchMenuItemsFromCloud();
       fetchOffersFromCloud();
       fetchAnnouncementFromCloud();
       fetchRequestsFromCloud();
       fetchReservationsFromCloud();
       fetchFeedbackFromCloud();
+      fetchChatMessages();
 
       renderClientFavoritesAndHistory();
       renderRoomFolioWidget();
       setInterval(() => {
         fetchRequestsFromCloud();
         fetchReservationsFromCloud();
+        fetchChatMessages();
       }, 5000);
     }
 
@@ -938,6 +1011,8 @@
         renderAdminList();
         renderAdminMenuList();
         renderAdminFeedback();
+        renderAdminChat();
+        renderPmsGuestsAdmin();
         renderAnalyticsData();
       } else {
         currentView = 'client';
@@ -946,6 +1021,242 @@
         btn.innerText = "⚙️ Staff Panel";
         renderClientCards();
       }
+    }
+
+    // GESTION DES CLIENTS DEPUIS LE RAPPORT PMS IN-HOUSE
+    async function fetchPmsGuests() {
+      const { data } = await supabaseClient.from('pms_guests').select('*');
+      cachedPmsGuests = data || [];
+      checkDetectedGuest();
+      if (currentView === 'admin') renderPmsGuestsAdmin();
+    }
+
+    async function handlePmsMassImport() {
+      const rawText = document.getElementById('pmsRawInput').value;
+      const lines = rawText.trim().split('\n');
+      const guestsToUpsert = [];
+
+      let currentRoom = '';
+
+      lines.forEach(line => {
+        const trimmed = line.trim();
+        if (!trimmed) return;
+
+        const firstWord = trimmed.split(/\s+/)[0];
+        if (validateRoomNumber(firstWord)) {
+          currentRoom = firstWord;
+          
+          const parts = trimmed.split(/\s{2,}|\t+/);
+          for (let p of parts) {
+            if ((p.includes(',') || p.includes('MR') || p.includes('MS')) && p.length > 5 && !p.includes('/')) {
+              guestsToUpsert.push({ room_number: currentRoom, guest_name: p.trim() });
+              break;
+            }
+          }
+        }
+      });
+
+      const uniqueGuestsMap = {};
+      guestsToUpsert.forEach(g => {
+        uniqueGuestsMap[g.room_number] = g.guest_name;
+      });
+
+      const finalGuestsToInsert = Object.keys(uniqueGuestsMap).map(room => ({
+        room_number: room,
+        guest_name: uniqueGuestsMap[room]
+      }));
+
+      if (finalGuestsToInsert.length > 0) {
+        await supabaseClient.from('pms_guests').delete().neq('id', 0);
+        const { error } = await supabaseClient.from('pms_guests').insert(finalGuestsToInsert);
+
+        if (error) {
+          alert("Erreur lors de l'import : " + error.message);
+        } else {
+          alert(`Succès ! ${finalGuestsToInsert.length} clients mis à jour depuis le rapport Inhouse.`);
+          document.getElementById('pmsRawInput').value = '';
+          await fetchPmsGuests();
+        }
+      } else {
+        alert("Format non reconnu. Assurez-vous de copier la zone utile du rapport PDF In-House.");
+      }
+    }
+
+    function renderPmsGuestsAdmin() {
+      const container = document.getElementById('pmsGuestsListContainer');
+      const countEl = document.getElementById('pmsGuestCount');
+      if (!container) return;
+
+      countEl.innerText = cachedPmsGuests.length;
+      if (cachedPmsGuests.length === 0) {
+        container.innerHTML = `<p class="text-stone-400 italic">Aucun client importé pour le moment.</p>`;
+        return;
+      }
+
+      container.innerHTML = cachedPmsGuests.map(g => `
+        <div class="flex justify-between items-center p-2 bg-stone-50 rounded-xl border border-stone-200">
+          <span>🏠 <strong>Chambre ${g.room_number}</strong> : ${g.guest_name}</span>
+        </div>
+      `).join('');
+    }
+
+    function checkDetectedGuest() {
+      const roomInput = document.getElementById('req_room');
+      const nameBox = document.getElementById('guestDetectedName');
+      const nameSpan = document.getElementById('detectedNameSpan');
+      
+      const chatRoomInput = document.getElementById('chat_room');
+      const chatNameBox = document.getElementById('chatGuestDetectedName');
+      const chatNameSpan = document.getElementById('chatDetectedNameSpan');
+
+      if (roomInput && nameBox && nameSpan) {
+        const currentRoom = roomInput.value.trim();
+        const found = cachedPmsGuests.find(g => String(g.room_number).trim().toLowerCase() === currentRoom.toLowerCase());
+        if (found) {
+          nameSpan.innerText = found.guest_name;
+          nameBox.classList.remove('hidden');
+        } else {
+          nameBox.classList.add('hidden');
+        }
+      }
+
+      if (chatRoomInput && chatNameBox && chatNameSpan) {
+        const currentChatRoom = chatRoomInput.value.trim();
+        const foundChat = cachedPmsGuests.find(g => String(g.room_number).trim().toLowerCase() === currentChatRoom.toLowerCase());
+        if (foundChat) {
+          chatNameSpan.innerText = foundChat.guest_name;
+          chatNameBox.classList.remove('hidden');
+        } else {
+          chatNameBox.classList.add('hidden');
+        }
+      }
+    }
+
+    // CHAT SYSTEM FUNCTIONS
+    async function fetchChatMessages() {
+      const { data, error } = await supabaseClient.from('chat_messages').select('*').order('id', { ascending: true });
+      if (error) return;
+      cachedChatMessages = data || [];
+
+      const guestMessages = cachedChatMessages.filter(m => m.sender === 'guest');
+      if (guestMessages.length > previousChatCount) {
+        playNotificationSound();
+      }
+      previousChatCount = guestMessages.length;
+
+      const chatBadge = document.getElementById('chatBadge');
+      if (guestMessages.length > 0 && chatBadge) {
+        chatBadge.innerText = guestMessages.length;
+        chatBadge.classList.remove('hidden');
+      }
+
+      if (currentView === 'client') {
+        renderClientChatMessages();
+      } else if (currentView === 'admin') {
+        renderAdminChat();
+      }
+    }
+
+    async function sendClientChatMessage(event) {
+      event.preventDefault();
+      const room = document.getElementById('chat_room').value.trim();
+      const message = document.getElementById('chatMessageInput').value.trim();
+
+      if (!room || !validateRoomNumber(room)) {
+        alert("Please enter a valid room number first.");
+        return;
+      }
+      if (!message) return;
+
+      localStorage.setItem('remal_client_room', room);
+
+      await supabaseClient.from('chat_messages').insert([{ room, sender: 'guest', message }]);
+      document.getElementById('chatMessageInput').value = '';
+      await fetchChatMessages();
+    }
+
+    function renderClientChatMessages() {
+      const room = document.getElementById('chat_room').value.trim();
+      const container = document.getElementById('chatMessagesContainer');
+      if (!container) return;
+
+      if (!room || !validateRoomNumber(room)) {
+        container.innerHTML = `<p class="text-center text-stone-400 py-10 italic">Enter your room number above to start chatting with reception.</p>`;
+        return;
+      }
+
+      const roomMessages = cachedChatMessages.filter(m => String(m.room).trim().toLowerCase() === room.toLowerCase());
+      if (roomMessages.length === 0) {
+        container.innerHTML = `<p class="text-center text-stone-400 py-10 italic">No messages yet. Send a message to reception below.</p>`;
+        return;
+      }
+
+      container.innerHTML = roomMessages.map(m => {
+        const isGuest = m.sender === 'guest';
+        return `
+          <div class="flex flex-col ${isGuest ? 'items-end' : 'items-start'}">
+            <div class="max-w-[80%] p-3 rounded-2xl text-xs ${isGuest ? 'bg-stone-900 text-white rounded-br-none' : 'bg-white border border-stone-200 text-stone-800 rounded-bl-none shadow-sm'}">
+              <p class="font-bold text-[9px] opacity-70 mb-0.5">${isGuest ? 'You' : 'Reception'}</p>
+              <p>${m.message}</p>
+            </div>
+          </div>
+        `;
+      }).join('');
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function renderAdminChat() {
+      const container = document.getElementById('adminChatContainer');
+      if (!container) return;
+
+      if (cachedChatMessages.length === 0) {
+        container.innerHTML = `<p class="text-xs text-stone-400 text-center py-4">No chat messages found.</p>`;
+        return;
+      }
+
+      const grouped = {};
+      cachedChatMessages.forEach(m => {
+        if (!grouped[m.room]) grouped[m.room] = [];
+        grouped[m.room].push(m);
+      });
+
+      container.innerHTML = Object.entries(grouped).map(([room, messages]) => {
+        const pmsMatch = cachedPmsGuests.find(g => String(g.room_number).trim().toLowerCase() === String(room).trim().toLowerCase());
+        const guestNameStr = pmsMatch ? ` — 👤 ${pmsMatch.guest_name}` : ` — <span class="text-rose-500 font-semibold">⚠️ Non vérifié PMS</span>`;
+
+        return `
+          <div class="p-4 bg-stone-50 rounded-2xl border border-stone-200 space-y-3">
+            <div class="flex justify-between items-center border-b border-stone-200 pb-2">
+              <span class="font-bold text-stone-900 text-sm">Room / Villa: ${room} ${guestNameStr}</span>
+              <span class="text-[10px] bg-amber-100 text-amber-800 font-bold px-2 py-0.5 rounded-full">${messages.length} messages</span>
+            </div>
+            <div class="space-y-2 max-h-48 overflow-y-auto pr-1">
+              ${messages.map(m => `
+                <div class="flex flex-col ${m.sender === 'staff' ? 'items-end' : 'items-start'}">
+                  <div class="max-w-[75%] p-2.5 rounded-xl text-xs ${m.sender === 'staff' ? 'bg-remal-sand text-white' : 'bg-white border border-stone-200 text-stone-800 shadow-sm'}">
+                    <p class="font-bold text-[8px] opacity-70">${m.sender === 'staff' ? 'Staff' : 'Guest (Room ' + room + ')'}</p>
+                    <p>${m.message}</p>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+            <form onsubmit="sendStaffChatMessage(event, '${room}')" class="flex space-x-2 pt-2">
+              <input type="text" id="staffMsg_${room}" placeholder="Reply to room ${room}..." class="flex-1 border border-stone-200 rounded-xl p-2.5 text-xs bg-white outline-none" required>
+              <button type="submit" class="bg-stone-900 text-white px-4 py-2 rounded-xl text-xs font-bold">Reply</button>
+            </form>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function sendStaffChatMessage(event, room) {
+      event.preventDefault();
+      const inputId = `staffMsg_${room}`;
+      const message = document.getElementById(inputId).value.trim();
+      if (!message) return;
+
+      await supabaseClient.from('chat_messages').insert([{ room, sender: 'staff', message }]);
+      await fetchChatMessages();
     }
 
     function setFeedbackRating(rating) {
@@ -982,15 +1293,19 @@
         container.innerHTML = `<p class="text-xs text-stone-400">No guest reviews submitted yet.</p>`;
         return;
       }
-      container.innerHTML = cachedFeedback.map(fb => `
-        <div class="p-4 bg-stone-50 rounded-2xl border border-stone-200 text-xs space-y-1">
-          <div class="flex justify-between font-bold text-stone-900">
-            <span>Room/Villa: ${fb.room}</span>
-            <span class="text-amber-500">${'★'.repeat(fb.rating)}${'☆'.repeat(5 - fb.rating)}</span>
+      container.innerHTML = cachedFeedback.map(fb => {
+        const pmsMatch = cachedPmsGuests.find(g => String(g.room_number).trim().toLowerCase() === String(fb.room).trim().toLowerCase());
+        const guestNameStr = pmsMatch ? ` (${pmsMatch.guest_name})` : '';
+        return `
+          <div class="p-4 bg-stone-50 rounded-2xl border border-stone-200 text-xs space-y-1">
+            <div class="flex justify-between font-bold text-stone-900">
+              <span>Room/Villa: ${fb.room}${guestNameStr}</span>
+              <span class="text-amber-500">${'★'.repeat(fb.rating)}${'☆'.repeat(5 - fb.rating)}</span>
+            </div>
+            <p class="text-stone-700">${fb.comment}</p>
           </div>
-          <p class="text-stone-700">${fb.comment}</p>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function renderFaqList() {
@@ -1245,25 +1560,32 @@
 
     function onRoomNumberChange() {
       const roomInput = document.getElementById('req_room');
+      const chatRoomInput = document.getElementById('chat_room');
       const roomError = document.getElementById('roomErrorMsg');
-      const val = roomInput.value.trim();
+      const val = roomInput ? roomInput.value.trim() : (chatRoomInput ? chatRoomInput.value.trim() : '');
+
+      if (roomInput && chatRoomInput) {
+        if (document.activeElement === roomInput) chatRoomInput.value = val;
+        if (document.activeElement === chatRoomInput) roomInput.value = val;
+      }
 
       if (val === '') {
-        roomError.classList.add('hidden');
-        roomInput.classList.remove('border-rose-500');
+        if (roomError) roomError.classList.add('hidden');
+        if (roomInput) roomInput.classList.remove('border-rose-500');
       } else if (!validateRoomNumber(val)) {
-        roomError.classList.remove('hidden');
-        roomInput.classList.add('border-rose-500');
+        if (roomError) roomError.classList.remove('hidden');
+        if (roomInput) roomInput.classList.add('border-rose-500');
       } else {
-        roomError.classList.add('hidden');
-        roomInput.classList.remove('border-rose-500');
-        // AMÉLIORATION : Sauvegarde automatique de la chambre valide dans l'appareil du client
+        if (roomError) roomError.classList.add('hidden');
+        if (roomInput) roomInput.classList.remove('border-rose-500');
         localStorage.setItem('remal_client_room', val);
       }
 
+      checkDetectedGuest();
       renderClientTracker();
       renderClientFavoritesAndHistory();
       renderRoomFolioWidget();
+      renderClientChatMessages();
     }
 
     function updateCart(itemId, change) {
@@ -1445,29 +1767,34 @@
         container.innerHTML = `<p class="text-xs text-stone-400 text-center py-4 col-span-2">No table reservations found.</p>`;
         return;
       }
-      container.innerHTML = cachedReservations.map(res => `
-        <div class="p-4 bg-stone-50 rounded-2xl border text-xs space-y-3 flex flex-col justify-between">
-          <div class="space-y-1">
-            <div class="flex justify-between items-start">
-              <div><span class="font-bold text-stone-900 text-sm">${res.name}</span><p class="text-remal-sand font-semibold">${res.venue}</p></div>
-              <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full ${res.status === 'Confirmed' ? 'bg-emerald-100 text-emerald-800' : res.status === 'Cancelled' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'}">${res.status || 'Pending'}</span>
+      container.innerHTML = cachedReservations.map(res => {
+        const pmsMatch = cachedPmsGuests.find(g => String(g.room_number).trim().toLowerCase() === String(res.room).trim().toLowerCase());
+        const guestNameStr = pmsMatch ? ` (PMS: ${pmsMatch.guest_name})` : ` (<span class="text-rose-500 font-semibold">Non vérifié</span>)`;
+
+        return `
+          <div class="p-4 bg-stone-50 rounded-2xl border text-xs space-y-3 flex flex-col justify-between">
+            <div class="space-y-1">
+              <div class="flex justify-between items-start">
+                <div><span class="font-bold text-stone-900 text-sm">${res.name}</span><p class="text-remal-sand font-semibold">${res.venue}</p></div>
+                <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full ${res.status === 'Confirmed' ? 'bg-emerald-100 text-emerald-800' : res.status === 'Cancelled' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'}">${res.status || 'Pending'}</span>
+              </div>
+              <div class="text-stone-600 space-y-0.5 pt-1">
+                <p>🏠 <strong>Room/Villa:</strong> ${res.room}${guestNameStr} | 👥 <strong>Guests:</strong> ${res.guests}</p>
+                <p>📅 <strong>Date:</strong> ${res.date} at ${res.time}</p>
+                <p>📝 <strong>Notes:</strong> ${res.notes}</p>
+              </div>
             </div>
-            <div class="text-stone-600 space-y-0.5 pt-1">
-              <p>🏠 <strong>Room/Villa:</strong> ${res.room} | 👥 <strong>Guests:</strong> ${res.guests}</p>
-              <p>📅 <strong>Date:</strong> ${res.date} at ${res.time}</p>
-              <p>📝 <strong>Notes:</strong> ${res.notes}</p>
+            <div class="flex justify-between items-center pt-2 border-t text-[11px]">
+              <div class="space-x-1">
+                <button onclick="updateReservationStatus(${res.id}, 'Pending')" class="px-2 py-1 bg-amber-100 text-amber-800 rounded font-semibold">Pending</button>
+                <button onclick="updateReservationStatus(${res.id}, 'Confirmed')" class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded font-semibold">Confirm</button>
+                <button onclick="updateReservationStatus(${res.id}, 'Cancelled')" class="px-2 py-1 bg-rose-100 text-rose-800 rounded font-semibold">Cancel</button>
+              </div>
+              <button onclick="deleteReservation(${res.id})" class="text-rose-600 font-bold p-1">🗑️</button>
             </div>
           </div>
-          <div class="flex justify-between items-center pt-2 border-t text-[11px]">
-            <div class="space-x-1">
-              <button onclick="updateReservationStatus(${res.id}, 'Pending')" class="px-2 py-1 bg-amber-100 text-amber-800 rounded font-semibold">Pending</button>
-              <button onclick="updateReservationStatus(${res.id}, 'Confirmed')" class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded font-semibold">Confirm</button>
-              <button onclick="updateReservationStatus(${res.id}, 'Cancelled')" class="px-2 py-1 bg-rose-100 text-rose-800 rounded font-semibold">Cancel</button>
-            </div>
-            <button onclick="deleteReservation(${res.id})" class="text-rose-600 font-bold p-1">🗑️</button>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     async function updateReservationStatus(id, newStatus) {
@@ -1613,10 +1940,23 @@
     function renderAdminRequests() {
       const container = document.getElementById('adminRequestsContainer');
       if (cachedRequests.length === 0) { container.innerHTML = `<p class="text-xs text-stone-400 text-center py-4 col-span-2">No active requests.</p>`; return; }
-      container.innerHTML = cachedRequests.map(req => `
+      container.innerHTML = cachedRequests.map(req => {
+        const pmsMatch = cachedPmsGuests.find(g => String(g.room_number).trim().toLowerCase() === String(req.room).trim().toLowerCase());
+        const guestNameDisplay = pmsMatch 
+          ? `<span class="text-emerald-700 font-bold">✔ PMS Vérifié : ${pmsMatch.guest_name}</span>` 
+          : `<span class="text-rose-600 font-bold">⚠️ Numéro non trouvé dans le PMS</span>`;
+
+        return `
         <div class="p-4 bg-stone-50 rounded-2xl border text-xs space-y-3 flex flex-col justify-between">
           <div class="space-y-2">
-            <div class="flex justify-between items-start"><div><span class="font-bold text-stone-900 text-sm">Room: ${req.room || 'N/A'}</span><p class="text-remal-sand font-semibold">${req.service}</p></div><span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full ${req.status === 'Completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${req.status || 'Pending'}</span></div>
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="font-bold text-stone-900 text-sm">Room / Villa: ${req.room || 'N/A'}</span>
+                <p class="text-[11px] mt-0.5">${guestNameDisplay}</p>
+                <p class="text-remal-sand font-semibold mt-1">${req.service}</p>
+              </div>
+              <span class="text-[10px] font-bold px-2.5 py-0.5 rounded-full ${req.status === 'Completed' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">${req.status || 'Pending'}</span>
+            </div>
             <p class="text-stone-700 bg-white p-3 rounded-xl border">${req.details}</p>
           </div>
           <div class="flex justify-between items-center pt-2 border-t text-[11px]">
@@ -1627,12 +1967,16 @@
             </div>
           </div>
         </div>
-      `).join('');
+      `;
+      }).join('');
     }
 
     function printRequestTicket(reqId) {
       const req = cachedRequests.find(r => r.id === reqId);
       if (!req) return;
+
+      const pmsMatch = cachedPmsGuests.find(g => String(g.room_number).trim().toLowerCase() === String(req.room).trim().toLowerCase());
+      const guestNameStr = pmsMatch ? ` - ${pmsMatch.guest_name} (PMS Verified)` : '';
 
       let statusBg = '#E2B383';
       if (req.status === 'In Progress') statusBg = '#2563EB';
@@ -1645,7 +1989,7 @@
       printTicket.classList.remove('hidden');
 
       printTicket.innerHTML = `
-        <div style="display: flex; justify-between: space-between; align-items: center; border-bottom: 2px solid #E2B383; padding-bottom: 12px; margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #E2B383; padding-bottom: 12px; margin-bottom: 15px;">
           <div>
             <h1 style="font-size: 20px; font-weight: bold; font-family: 'Playfair Display', serif; margin: 0; color: #111;">REMAL HOTEL & VILLAS</h1>
             <p style="font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin: 2px 0 0 0;">Al Dhannah City • Guest Hub Service Ticket</p>
@@ -1658,8 +2002,8 @@
 
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background: #F9F9F9; padding: 12px; border-radius: 8px; margin-bottom: 15px; border: 1px solid #EEE;">
           <div>
-            <span style="font-size: 10px; color: #777; text-transform: uppercase; font-weight: bold;">Room / Villa</span>
-            <div style="font-size: 15px; font-weight: bold; color: #111; margin-top: 2px;">${req.room || 'N/A'}</div>
+            <span style="font-size: 10px; color: #777; text-transform: uppercase; font-weight: bold;">Room / Villa & Guest</span>
+            <div style="font-size: 15px; font-weight: bold; color: #111; margin-top: 2px;">${req.room || 'N/A'}${guestNameStr}</div>
           </div>
           <div>
             <span style="font-size: 10px; color: #777; text-transform: uppercase; font-weight: bold;">Service Type</span>
@@ -1695,6 +2039,9 @@
         alert("Please enter a valid Room Number first.");
         return;
       }
+
+      const pmsMatch = cachedPmsGuests.find(g => String(g.room_number).trim().toLowerCase() === roomNum.toLowerCase());
+      const guestNameStr = pmsMatch ? pmsMatch.guest_name : 'Valued Guest (PMS Unverified)';
 
       const roomReqs = cachedRequests.filter(r => String(r.room).trim().toLowerCase() === roomNum.toLowerCase());
       let totalSpent = 0;
@@ -1734,7 +2081,7 @@
             <p style="font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 1px; margin: 2px 0 0 0;">Al Dhannah City • Official Room Folio Statement</p>
           </div>
           <div style="text-align: right; font-size: 11px; color: #444;">
-            <div><strong>Room / Villa:</strong> ${roomNum}</div>
+            <div><strong>Room / Villa:</strong> ${roomNum} (${guestNameStr})</div>
             <div style="font-size: 10px; color: #666; margin-top: 1px;">Date: ${new Date().toLocaleDateString()}</div>
           </div>
         </div>
@@ -1830,13 +2177,15 @@
       let details = document.getElementById('req_details').value;
 
       if (!room || !validateRoomNumber(room)) {
-        alert("❌ Erreur : Veuillez entrer un numéro de chambre أو de villa valide.");
+        alert("❌ Erreur : Veuillez entrer un numéro de chambre ou de villa valide.");
         document.getElementById('req_room').focus();
         return;
       }
       
-      // Mémorisation de la chambre sur l'appareil au moment de l'envoi
       localStorage.setItem('remal_client_room', room);
+
+      const pmsMatch = cachedPmsGuests.find(g => String(g.room_number).trim().toLowerCase() === room.toLowerCase());
+      const guestNameStr = pmsMatch ? pmsMatch.guest_name : 'Unknown Guest (PMS Unverified)';
 
       if (service === 'Room Service / Dining') {
         const total = calculateCartTotal();
@@ -1848,11 +2197,13 @@
             orderSummary.push(`${cartState[item.id]}x ${itemName}`);
           }
         });
-        details = `🛒 ORDER: ${orderSummary.join(', ')}\n💰 Total: AED ${total}\n🕒 Time: ${deliveryTime}\n📝 Notes: ${details || 'None'}`;
+        details = `👤 Guest: ${guestNameStr}\n🛒 ORDER: ${orderSummary.join(', ')}\n💰 Total: AED ${total}\n🕒 Time: ${deliveryTime}\n📝 Notes: ${details || 'None'}`;
+      } else {
+        details = `👤 Guest: ${guestNameStr}\n📝 Details: ${details}`;
       }
 
       await supabaseClient.from('requests').insert([{ room, service, details, status: 'Pending' }]);
-      const textMessage = encodeURIComponent(`Hello Remal Reception,\nI submitted a request for Room/Villa ${room}.\n\n*Service:* ${service}\n*Details:*\n${details}`);
+      const textMessage = encodeURIComponent(`Hello Remal Reception,\nI submitted a request for Room/Villa ${room} (${guestNameStr}).\n\n*Service:* ${service}\n*Details:*\n${details}`);
       document.getElementById('btnWhatsappDirect').href = `https://wa.me/971526966865?text=${textMessage}`;
       document.getElementById('whatsappConfirmation').classList.remove('hidden');
       document.getElementById('req_details').value = '';
@@ -1869,22 +2220,34 @@
     async function deleteOffer(id) { if (confirm('Delete?')) { await supabaseClient.from('offers').delete().eq('id', id); await fetchOffersFromCloud(); } }
 
     function switchGuestTab(tab) {
-      ['guestOffersSection', 'guestFacilitiesSection', 'guestFaqSection', 'guestRequestSection', 'guestReservationSection'].forEach(s => document.getElementById(s).classList.add('hidden'));
-      ['tabOffersBtn', 'tabFacilitiesBtn', 'tabFaqBtn', 'tabRequestBtn', 'tabReservationBtn'].forEach(b => document.getElementById(b).className = "flex-1 py-2.5 px-3 rounded-xl text-stone-200 hover:text-white whitespace-nowrap");
+      ['guestOffersSection', 'guestFacilitiesSection', 'guestFaqSection', 'guestRequestSection', 'guestReservationSection', 'guestChatSection'].forEach(s => document.getElementById(s).classList.add('hidden'));
+      ['tabOffersBtn', 'tabFacilitiesBtn', 'tabFaqBtn', 'tabRequestBtn', 'tabReservationBtn', 'tabChatBtn'].forEach(b => {
+        const el = document.getElementById(b);
+        if(el) el.className = "flex-1 py-2.5 px-3 rounded-xl text-stone-200 hover:text-white whitespace-nowrap";
+      });
 
       if (tab === 'offers') { document.getElementById('guestOffersSection').classList.remove('hidden'); document.getElementById('tabOffersBtn').className = "flex-1 py-2.5 px-3 rounded-xl bg-white text-stone-900 font-bold shadow-md whitespace-nowrap"; }
       else if (tab === 'facilities') { document.getElementById('guestFacilitiesSection').classList.remove('hidden'); document.getElementById('tabFacilitiesBtn').className = "flex-1 py-2.5 px-3 rounded-xl bg-white text-stone-900 font-bold shadow-md whitespace-nowrap"; }
       else if (tab === 'faq') { document.getElementById('guestFaqSection').classList.remove('hidden'); document.getElementById('tabFaqBtn').className = "flex-1 py-2.5 px-3 rounded-xl bg-white text-stone-900 font-bold shadow-md whitespace-nowrap"; renderFaqList(); }
       else if (tab === 'reservation') { document.getElementById('guestReservationSection').classList.remove('hidden'); document.getElementById('tabReservationBtn').className = "flex-1 py-2.5 px-3 rounded-xl bg-white text-stone-900 font-bold shadow-md whitespace-nowrap"; }
-      else if (tab === 'request') { document.getElementById('guestRequestSection').classList.remove('hidden'); document.getElementById('tabRequestBtn').className = "flex-1 py-2.5 px-3 rounded-xl bg-white text-stone-900 font-bold shadow-md whitespace-nowrap"; toggleServiceDynamicFields(); renderClientTracker(); renderClientFavoritesAndHistory(); renderRoomFolioWidget(); }
+      else if (tab === 'chat') { document.getElementById('guestChatSection').classList.remove('hidden'); document.getElementById('tabChatBtn').className = "flex-1 py-2.5 px-3 rounded-xl bg-white text-stone-900 font-bold shadow-md whitespace-nowrap"; renderClientChatMessages(); checkDetectedGuest(); }
+      else if (tab === 'request') { document.getElementById('guestRequestSection').classList.remove('hidden'); document.getElementById('tabRequestBtn').className = "flex-1 py-2.5 px-3 rounded-xl bg-white text-stone-900 font-bold shadow-md whitespace-nowrap"; toggleServiceDynamicFields(); renderClientTracker(); renderClientFavoritesAndHistory(); renderRoomFolioWidget(); checkDetectedGuest(); }
     }
 
     function switchAdminTab(tab) {
-      ['adminOffersPanel', 'adminRequestsPanel', 'adminReservationsPanel', 'adminFeedbackPanel', 'adminAnalyticsPanel', 'adminBannerPanel'].forEach(p => document.getElementById(p).classList.add('hidden'));
+      ['adminOffersPanel', 'adminRequestsPanel', 'adminReservationsPanel', 'adminFeedbackPanel', 'adminAnalyticsPanel', 'adminBannerPanel', 'adminChatPanel', 'adminPmsPanel'].forEach(p => {
+        const el = document.getElementById(p);
+        if(el) el.classList.add('hidden');
+      });
       if (tab === 'offers') document.getElementById('adminOffersPanel').classList.remove('hidden');
+      else if (tab === 'pms') document.getElementById('adminPmsPanel').classList.remove('hidden');
       else if (tab === 'requests') { 
         document.getElementById('adminRequestsPanel').classList.remove('hidden'); 
         fetchRequestsFromCloud(); 
+      }
+      else if (tab === 'chat') {
+        document.getElementById('adminChatPanel').classList.remove('hidden');
+        fetchChatMessages();
       }
       else if (tab === 'reservations') {
         document.getElementById('adminReservationsPanel').classList.remove('hidden');
@@ -1925,6 +2288,7 @@
       document.getElementById('lblTabFacilities').innerText = t.lblFacilities;
       document.getElementById('lblTabFaq').innerText = t.lblFaq;
       document.getElementById('lblTabRequest').innerText = t.lblService;
+      document.getElementById('lblTabChat').innerText = t.lblChat;
       document.getElementById('lblTabReservation').innerText = t.lblReservation;
       document.getElementById('reqHeader').innerText = t.reqHeader;
       document.getElementById('btnSubmitReq').innerText = t.btnSubmit;
