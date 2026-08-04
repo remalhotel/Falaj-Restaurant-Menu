@@ -912,7 +912,7 @@
     const categoriesTranslations = {
       en: { 'All': 'All Services', 'Falaj Restaurant': 'Falaj Restaurant', 'Sarab': 'Sarab Bar', 'Al Waha Pool': 'Al Waha Pool' },
       ar: { 'All': 'جميع الخدمات', 'Falaj Restaurant': 'مطعم الفلج', 'Sarab': 'بار سراب', 'Al Waha Pool': 'مسبح الواحة' },
-      hi: { 'All': 'सभी सेवाएं', 'Falaj Restaurant': 'फलज रेस्टोरेंट', 'Sarab': 'सराब बार', 'Al Waha Pool': 'अल वाहा पूल' }
+      hi: { 'All': 'सभी सेवाएं', 'Falaj Restaurant': 'फलज रेस्टोरेंट', 'Sarab': 'सराब बार', 'अल वाहा पूल': 'अल वाहा पूल' }
     };
 
     function validateRoomNumber(roomStr) {
@@ -1105,41 +1105,52 @@
       }
     }
 
-    // ANALYSE ET SYNCHRONISATION PMS PRÉCISE (Basée sur le format In-House)
+    // ANALYSE ET SYNCHRONISATION PMS PRÉCISE (Basée sur la 6ème colonne exacte)
     async function handlePmsMassImport() {
       const rawText = document.getElementById('pmsRawInput').value;
       if (!rawText.trim()) {
-        alert("Veuillez d'abord charger un PDF ou coller le texte du rapport In-House.");
+        alert("Veuillez d'abord charger un fichier PDF ou coller le texte du rapport In-House.");
         return;
       }
 
       const lines = rawText.split('\n');
-      const guestsToUpsert = [];
       const uniqueRoomsMap = {};
+      let currentRoom = null;
 
       lines.forEach(line => {
         const trimmed = line.trim();
         if (!trimmed) return;
 
-        // Détecte une ligne commençant par un numéro de chambre valide (ex: 222, 223, 224)
-        const match = trimmed.match(/^([0-9]{3,4})\b\s+(.*)/);
-        if (match) {
-          const roomNum = match[1];
-          const remainder = match[2];
-
+        // 1. Détecter le numéro de chambre au début de la ligne (ex: 222, 223, 224)
+        const roomMatch = trimmed.match(/^([0-9]{3,4})\b/);
+        if (roomMatch) {
+          const roomNum = roomMatch[1];
           if (validateRoomNumber(roomNum)) {
-            let parts = remainder.split(/\s{2,}|(?=\b(?:B1|DLXR|PRMR|SUIT|EXPEDIA|ERTH|Borough)\b)/i);
-            let nameCandidate = parts[0].trim();
+            currentRoom = roomNum;
+          }
+        }
 
-            nameCandidate = nameCandidate.replace(/^(DLXR|PRMR|SUIT|B1)\s*/i, '').trim();
+        // 2. Le nom et prénom se trouvent dans la 6ème colonne, comportant une virgule et suivis de MR / MS
+        if (currentRoom && trimmed.includes(',') && (trimmed.includes('MR') || trimmed.includes('MS'))) {
+          // Découpage des éléments de la ligne par espaces multiples
+          const tokens = trimmed.split(/\s{2,}/);
 
-            if (nameCandidate && nameCandidate.length > 2 && !nameCandidate.match(/^[0-9\/]+$/)) {
-              uniqueRoomsMap[roomNum] = nameCandidate;
+          // On cherche dans les blocs de la ligne celui qui correspond au format "Nom, Prénom ... MR/MS"
+          for (let token of tokens) {
+            if (token.includes(',') && (token.includes('MR') || token.includes('MS')) && !token.match(/^[0-9\/]+$/)) {
+              // Nettoyage pour garder uniquement le nom et le prénom (ex: "Jesunathan Ganpa,Pinkesh Jea MR" -> "Jesunathan Ganpa, Pinkesh Jea")
+              let cleanName = token.replace(/\b(MR|MS)\b/gi, '').trim();
+              
+              if (cleanName.includes(',')) {
+                uniqueRoomsMap[currentRoom] = cleanName;
+                break;
+              }
             }
           }
         }
       });
 
+      // Transformation en tableau d'objets pour Supabase
       const finalGuestsToInsert = Object.keys(uniqueRoomsMap).map(room => ({
         room_number: room,
         guest_name: uniqueRoomsMap[room]
@@ -1152,14 +1163,14 @@
         if (error) {
           alert("Erreur lors de l'import Supabase : " + error.message);
         } else {
-          alert(`Succès ! ${finalGuestsToInsert.length} clients synchronisés avec le système.`);
+          alert(`Succès ! ${finalGuestsToInsert.length} clients synchronisés depuis la 6ème colonne (Chambres : ${Object.keys(uniqueRoomsMap).join(', ')}).`);
           document.getElementById('pmsRawInput').value = '';
           document.getElementById('pdfFileNameDisplay').innerText = 'Aucun fichier sélectionné';
           document.getElementById('pmsPdfFileInput').value = '';
           await fetchPmsGuests();
         }
       } else {
-        alert("Aucune correspondance de chambre valide n'a pu être extraite automatiquement.");
+        alert("Aucun nom de client n'a pu être extrait de la 6ème colonne. Vérifiez le texte source.");
       }
     }
 
@@ -2424,4 +2435,4 @@
     window.onload = init;
   </script>
 </body>
-  </html>
+</html>
