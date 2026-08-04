@@ -1066,42 +1066,95 @@
         for (let i = 1; i <= pdfDocument.numPages; i++) {
           const page = await pdfDocument.getPage(i);
           const textContent = await page.getTextContent();
-          const pageText = textContent.items.map(item => item.str).join(" ");
-          fullExtractedText += pageText + "\n";
+          
+          let items = textContent.items.map(item => ({
+            str: item.str,
+            x: item.transform[4],
+            y: item.transform[5]
+          }));
+
+          items.sort((a, b) => b.y - a.y || a.x - b.x);
+          
+          let lines = [];
+          let currentLine = [];
+          let lastY = null;
+
+          items.forEach(item => {
+            if (lastY === null || Math.abs(item.y - lastY) > 5) {
+              if (currentLine.length > 0) {
+                lines.push(currentLine.join(" "));
+              }
+              currentLine = [item.str];
+              lastY = item.y;
+            } else {
+              currentLine.push(item.str);
+            }
+          });
+          if (currentLine.length > 0) {
+            lines.push(currentLine.join(" "));
+          }
+
+          fullExtractedText += lines.join("\n") + "\n--- PAGE BREAK ---\n";
         }
 
         document.getElementById('pmsRawInput').value = fullExtractedText;
         alert(`PDF lu avec succès ! (${pdfDocument.numPages} page(s) traitée(s)). Cliquez sur "Synchroniser" pour valider.`);
       } catch (error) {
         console.error("Erreur de lecture du PDF :", error);
-        alert("Impossible de lire ce fichier PDF. Veuillez vérifier qu'il n'est pas corrompu.");
+        alert("Impossible de lire ce fichier PDF. Veuillez vérifier qu'il n'est pas protégé par mot de passe ou corrompu.");
       }
     }
 
+    // ANALYSE ET SYNCHRONISATION PMS ASSOUPLIE
     async function handlePmsMassImport() {
       const rawText = document.getElementById('pmsRawInput').value;
-      const lines = rawText.trim().split('\n');
-      const guestsToUpsert = [];
+      if (!rawText.trim()) {
+        alert("Veuillez d'abord charger un PDF ou coller le texte du rapport In-House.");
+        return;
+      }
 
+      const lines = rawText.split('\n');
+      const guestsToUpsert = [];
       let currentRoom = '';
 
       lines.forEach(line => {
         const trimmed = line.trim();
-        if (!trimmed) return;
+        if (!trimmed || trimmed.startsWith('---')) return;
 
-        const firstWord = trimmed.split(/\s+/)[0];
-        if (validateRoomNumber(firstWord)) {
-          currentRoom = firstWord;
-          
-          const parts = trimmed.split(/\s{2,}|\t+/);
-          for (let p of parts) {
-            if ((p.includes(',') || p.includes('MR') || p.includes('MS')) && p.length > 5 && !p.includes('/')) {
-              guestsToUpsert.push({ room_number: currentRoom, guest_name: p.trim() });
-              break;
-            }
+        const words = trimmed.split(/\s+/);
+        let foundRoom = null;
+
+        for (let word of words) {
+          let cleanWord = word.replace(/[^0-9]/g, '');
+          if (validateRoomNumber(cleanWord)) {
+            foundRoom = cleanWord;
+            break;
           }
         }
+
+        if (foundRoom) {
+          currentRoom = foundRoom;
+          const nameCandidate = words.filter(w => w.length > 1 && !validateRoomNumber(w.replace(/[^0-9]/g, '')) && !w.match(/^[0-9\/:-]+$/)).join(' ');
+          
+          if (nameCandidate && nameCandidate.length > 2) {
+            guestsToUpsert.push({ room_number: currentRoom, guest_name: nameCandidate });
+          }
+        } else if (currentRoom && trimmed.length > 2 && !trimmed.toLowerCase().includes('page') && !trimmed.toLowerCase().includes('report')) {
+          guestsToUpsert.push({ room_number: currentRoom, guest_name: trimmed });
+        }
       });
+
+      if (guestsToUpsert.length === 0) {
+        lines.forEach(line => {
+          const match = line.match(/(?:chambre|room|rm)?\s*([0-9]{3,4})\b/i);
+          if (match && validateRoomNumber(match[1])) {
+            const cleanName = line.replace(match[0], '').trim();
+            if (cleanName.length > 2) {
+              guestsToUpsert.push({ room_number: match[1], guest_name: cleanName });
+            }
+          }
+        });
+      }
 
       const uniqueGuestsMap = {};
       guestsToUpsert.forEach(g => {
@@ -1118,16 +1171,16 @@
         const { error } = await supabaseClient.from('pms_guests').insert(finalGuestsToInsert);
 
         if (error) {
-          alert("Erreur lors de l'import : " + error.message);
+          alert("Erreur lors de l'import Supabase : " + error.message);
         } else {
-          alert(`Succès ! ${finalGuestsToInsert.length} clients mis à jour depuis le rapport Inhouse.`);
+          alert(`Succès ! ${finalGuestsToInsert.length} clients synchronisés avec le système.`);
           document.getElementById('pmsRawInput').value = '';
           document.getElementById('pdfFileNameDisplay').innerText = 'Aucun fichier sélectionné';
           document.getElementById('pmsPdfFileInput').value = '';
           await fetchPmsGuests();
         }
       } else {
-        alert("Format non reconnu. Assurez-vous de charger un bon rapport PDF In-House.");
+        alert("Format non reconnu ou aucune chambre valide trouvée. Assurez-vous que le PDF contient des numéros de chambre valides (ex: 420, 504).");
       }
     }
 
