@@ -7,6 +7,11 @@
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Ajout de pdf.js pour la lecture directe des fichiers PDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+  </script>
   <style>
     body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #FAFAFA; color: #222222; }
     .font-serif-luxury { font-family: 'Playfair Display', serif; }
@@ -94,7 +99,6 @@
         <div class="space-y-2">
           <label class="block text-xs font-bold text-stone-600">Your Room / Villa Number</label>
           <input type="text" id="chat_room" placeholder="Enter room number (e.g. 222)" onkeyup="onRoomNumberChange()" class="w-full border border-stone-200 rounded-xl p-2.5 text-xs bg-stone-50 outline-none" required>
-          <!-- Affichage dynamique du nom du client détecté dans le chat -->
           <p id="chatGuestDetectedName" class="text-emerald-700 text-xs font-bold mt-1 hidden">👤 Client détecté : <span id="chatDetectedNameSpan" class="underline"></span></p>
         </div>
 
@@ -198,7 +202,6 @@
           <div>
             <label class="block text-xs font-bold text-stone-600 mb-1 tracking-wide" id="lblRoom">Room Number</label>
             <input type="text" id="req_room" placeholder="e.g., 222, 223 or 224" onkeyup="onRoomNumberChange()" onchange="onRoomNumberChange()" class="w-full border border-stone-200 rounded-xl p-3 text-sm bg-stone-50/55 outline-none" required>
-            <!-- Affichage dynamique du nom du client détecté -->
             <p id="guestDetectedName" class="text-emerald-700 text-xs font-bold mt-1.5 hidden">👤 Client détecté : <span id="detectedNameSpan" class="underline"></span></p>
             <p id="roomErrorMsg" class="text-rose-600 text-[11px] font-bold mt-1 hidden">❌ Erreur de numéro : Numéro de chambre ou de villa invalide.</p>
           </div>
@@ -362,13 +365,28 @@
     <div id="adminPmsPanel" class="hidden space-y-4">
       <div class="bg-white rounded-3xl p-6 shadow-sm border border-stone-200 space-y-4">
         <div>
-          <h2 class="text-base font-serif-luxury font-bold text-stone-900">📋 PMS In-House Report Mass Import</h2>
-          <p class="text-xs text-stone-500 mt-1">Collez ci-dessous le rapport In-House copié depuis votre PDF PMS. Le système met à jour automatiquement la correspondance des chambres et noms de clients.</p>
+          <h2 class="text-base font-serif-luxury font-bold text-stone-900">📋 PMS In-House Report - Import PDF</h2>
+          <p class="text-xs text-stone-500 mt-1">Téléchargez directement votre fichier PDF In-House ou collez le texte ci-dessous. Le système extraira et synchronisera automatiquement les chambres et les noms.</p>
         </div>
+
+        <!-- ZONE DE TELECHARGEMENT DIRECT DE FICHIER PDF -->
+        <div class="p-5 bg-stone-50 rounded-2xl border-2 border-dashed border-stone-300 text-center space-y-3">
+          <div class="text-2xl">📄</div>
+          <div>
+            <label class="cursor-pointer bg-stone-900 hover:bg-stone-800 text-white font-bold py-2.5 px-5 rounded-xl text-xs inline-block shadow transition">
+              📂 Choisir un fichier PDF In-House
+              <input type="file" id="pmsPdfFileInput" accept=".pdf" onchange="handlePmsPdfUpload(event)" class="hidden">
+            </label>
+            <p id="pdfFileNameDisplay" class="text-[11px] text-stone-500 mt-2 italic">Aucun fichier sélectionné</p>
+          </div>
+        </div>
+
         <div class="space-y-2">
-          <textarea id="pmsRawInput" rows="8" placeholder="Collez le texte du rapport PDF ici..." class="w-full border border-stone-200 rounded-2xl p-3.5 text-xs bg-stone-50 outline-none font-mono"></textarea>
+          <label class="block text-xs font-bold text-stone-600 uppercase">Ou collage direct du texte :</label>
+          <textarea id="pmsRawInput" rows="5" placeholder="Le texte extrait du PDF apparaîtra ici (ou vous pouvez coller manuellement)..." class="w-full border border-stone-200 rounded-2xl p-3 text-xs bg-stone-50 outline-none font-mono"></textarea>
         </div>
-        <button type="button" onclick="handlePmsMassImport()" class="bg-stone-900 hover:bg-stone-800 text-white font-bold py-3 px-6 rounded-xl text-xs transition shadow">🚀 Synchroniser et Remplacer la Base</button>
+
+        <button type="button" onclick="handlePmsMassImport()" class="w-full bg-remal-sand hover:bg-amber-700 text-white font-bold py-3 px-6 rounded-xl text-xs transition shadow">🚀 Synchroniser et Remplacer la Base</button>
 
         <div class="pt-4 border-t border-stone-100 space-y-3">
           <h3 class="text-xs font-bold text-stone-700 uppercase tracking-wide">Clients actuellement en maison dans le système (<span id="pmsGuestCount">0</span>)</h3>
@@ -1031,6 +1049,35 @@
       if (currentView === 'admin') renderPmsGuestsAdmin();
     }
 
+    // LECTURE AUTOMATIQUE DU FICHIER PDF UPLOADE
+    async function handlePmsPdfUpload(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      document.getElementById('pdfFileNameDisplay').innerText = `Fichier sélectionné : ${file.name}`;
+
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+        const pdfDocument = await loadingTask.promise;
+        
+        let fullExtractedText = "";
+
+        for (let i = 1; i <= pdfDocument.numPages; i++) {
+          const page = await pdfDocument.getPage(i);
+          const textContent = await page.getTextContent();
+          const pageText = textContent.items.map(item => item.str).join(" ");
+          fullExtractedText += pageText + "\n";
+        }
+
+        document.getElementById('pmsRawInput').value = fullExtractedText;
+        alert(`PDF lu avec succès ! (${pdfDocument.numPages} page(s) traitée(s)). Cliquez sur "Synchroniser" pour valider.`);
+      } catch (error) {
+        console.error("Erreur de lecture du PDF :", error);
+        alert("Impossible de lire ce fichier PDF. Veuillez vérifier qu'il n'est pas corrompu.");
+      }
+    }
+
     async function handlePmsMassImport() {
       const rawText = document.getElementById('pmsRawInput').value;
       const lines = rawText.trim().split('\n');
@@ -1075,10 +1122,12 @@
         } else {
           alert(`Succès ! ${finalGuestsToInsert.length} clients mis à jour depuis le rapport Inhouse.`);
           document.getElementById('pmsRawInput').value = '';
+          document.getElementById('pdfFileNameDisplay').innerText = 'Aucun fichier sélectionné';
+          document.getElementById('pmsPdfFileInput').value = '';
           await fetchPmsGuests();
         }
       } else {
-        alert("Format non reconnu. Assurez-vous de copier la zone utile du rapport PDF In-House.");
+        alert("Format non reconnu. Assurez-vous de charger un bon rapport PDF In-House.");
       }
     }
 
